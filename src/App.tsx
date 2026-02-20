@@ -19,6 +19,8 @@ function App() {
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   //estado para almacenar la informacion de los trabajos
   const [jobs, setJobs] = useState<Job[]>([]);
+  //estado para almacenar las urls
+  const [urls, setUrls] = useState<Record<string, string>>({});
   
   useEffect(() => {
     const fetchCandidateData = async () => {
@@ -50,45 +52,73 @@ function App() {
 
     fetchCandidateData();
   }, []);
+  
+  //funcion para manejar el cambio de las urls en los inpus
+  const handleUrlChange = (jobId: string, value: string) => {
+    setUrls({
+      ...urls, [jobId]: value 
+    });
+  };
+
+  //funcion para manejar el submit del formulario (placeholder)
+  const handleSubmit = (jobId: string) => {
+    const urlIngresada = urls[jobId];
+  };
 
   return (
-    
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h1>Postulación a Trabajo</h1>
-      {/* renderizado de la informacion del candidato*/}
-      {candidate ? (
-        <div style={{ background: '#e0f7fa', padding: '15px', borderRadius: '8px' }}>
-          <p style={{ margin: '0 0 10px 0', fontSize: '1.1em' }}><strong>Candidato:</strong></p>
-          <ul style={{ margin: 0, paddingLeft: '20px', lineHeight: '1.6' }}>
-            <li><strong>Nombre:</strong> {candidate.firstName}</li>
-            <li><strong>Apellido:</strong> {candidate.lastName}</li>
-            <li><strong>Email:</strong> {candidate.email}</li>
-            <li><strong>UUID:</strong> {candidate.uuid}</li>
-            <li><strong>Candidate ID:</strong> {candidate.candidateId}</li>
-            <li><strong>Application ID:</strong> {candidate.applicationId}</li>
-          </ul>
-        </div>
-      ): (
-        <p>Cargando datos del candidato...</p>
-      )}
-      {/* renderizado de la informacion de los trabajos disponibles */}
-      <h2>Posiciones Abiertas</h2>
-      {jobs.length > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {jobs.map((job) => (
-            <div key={job.id} style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px', background: '#f9f9f9' }}>
-              <ul style={{ margin: 0, paddingLeft: '20px', lineHeight: '1.6' }}>
-                <li><strong>id:</strong> {job.id}</li>
-                <li><strong>title:</strong> {job.title}</li>
-              </ul>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p>Cargando posiciones...</p>
-      )}
+    <div>
+      {/* renderizado de la informacion del candidato como header */}
+      <header>
+        <h1>Postulación a Trabajo</h1>
+        {candidate ? (
+          <fieldset>
+            <legend>Candidato</legend>
+            <p><strong>Nombre:</strong> {candidate.firstName} {candidate.lastName}</p>
+            <p><strong>Email:</strong> {candidate.email}</p>
+            <p><strong>UUID:</strong> {candidate.uuid}</p>
+            <p><strong>Candidate ID:</strong> {candidate.candidateId}</p>
+            <p><strong>Application ID:</strong> {candidate.applicationId}</p>
+          </fieldset>
+        ) : (
+          <p>Cargando datos del candidato...</p>
+        )}
+      </header>
+
+      <hr />
+
+      {/* renderizado de informacion de los trabajos y boton de submit */}
+      <main>
+        <h2>Posiciones Abiertas</h2>
+        {jobs.length > 0 ? (
+          <div>
+            {jobs.map((job) => (
+              <fieldset key={job.id}>
+                <legend>Posición</legend>
+                <ul>
+                  <li><strong>id:</strong> {job.id}</li>
+                  <li><strong>title:</strong> {job.title}</li>
+                </ul>
+                <div>
+                  <label>URL del repositorio: </label>
+                  <input 
+                    type="text" 
+                    placeholder="https://github.com/tu-usuario/tu-repo"
+                    value={urls[job.id] || ""} 
+                    onChange={(e) => handleUrlChange(job.id, e.target.value)}
+                  />
+                  <button onClick={() => handleSubmit(job.id)}>
+                    Submit
+                  </button>
+                </div>
+              </fieldset>
+            ))}
+          </div>
+        ) : (
+          <p>Cargando posiciones...</p>
+        )}
+      </main>
     </div>
   );
 }
 
-export default App
+export default App;
