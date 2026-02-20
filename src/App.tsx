@@ -60,9 +60,46 @@ function App() {
     });
   };
 
-  //funcion para manejar el submit del formulario (placeholder)
-  const handleSubmit = (jobId: string) => {
+  //funcion para manejar el submit del formulario 
+  const handleSubmit = async (jobId: string) => {
     const urlIngresada = urls[jobId];
+    
+    if (!urlIngresada || !candidate) {
+      alert("Faltan datos.");
+      return;
+    }
+
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL;
+      
+      const response = await fetch(`${baseUrl}/api/candidate/apply-to-job`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uuid: candidate.uuid,
+          jobId: jobId,
+          candidateId: candidate.candidateId,
+          repoUrl: urlIngresada
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || JSON.stringify(errorData));
+      }
+
+      const data = await response.json();
+      
+      if (data.ok) {
+        alert("Exito al enviar la postulación.");
+      }
+      
+    } catch (error) {
+      console.error(error);
+      alert("Error al enviar la postulación.");
+    }
   };
 
   return (
